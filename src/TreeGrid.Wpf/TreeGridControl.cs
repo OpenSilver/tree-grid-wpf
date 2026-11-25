@@ -1615,6 +1615,13 @@ namespace TreeGrid.Wpf
             _scrollViewer = GetTemplateChild(PartScrollViewer) as ScrollViewer;
             _container = GetTemplateChild(PartVisualContainer) as VisualContainer;
 
+#if OPENSILVER
+            // OpenSilver's Focus() on a non-focusable element focuses its first tab stop instead, so the
+            // ScrollViewer would move focus to a cell and mark every press handled before it reaches the grid.
+            if (_scrollViewer != null)
+                KeyboardNavigation.SetTabNavigation(_scrollViewer, KeyboardNavigationMode.None);
+#endif
+
             if (_container != null)
             {
                 _container.Source = _dataSource.View;
@@ -2460,8 +2467,13 @@ namespace TreeGrid.Wpf
                 if (current is TreeGridCell cell)
                     return isInteractive && cell.Node != null && !cell.Node.IsGroupHeader ? cell : null;
 
+#if OPENSILVER // OpenSilver's TextBox does not derive from TextBoxBase.
+                if (current is ButtonBase || current is TextBoxBase || current is TextBox || current is PasswordBox ||
+                    current is Selector || current is RangeBase || current is Hyperlink)
+#else
                 if (current is ButtonBase || current is TextBoxBase || current is PasswordBox ||
                     current is Selector || current is RangeBase || current is Hyperlink)
+#endif
                 {
                     isInteractive = true;
                 }
@@ -3104,7 +3116,11 @@ namespace TreeGrid.Wpf
                 return false;
             }
 
+#if OPENSILVER // WpfCompat extension members need an explicit receiver.
+            var screenPoint = this.PointToScreen(e.GetPosition(this));
+#else
             var screenPoint = PointToScreen(e.GetPosition(this));
+#endif
 
             if (!_headerDragging)
             {
@@ -3206,7 +3222,11 @@ namespace TreeGrid.Wpf
             };
 
             layer.Add(_dragPreview);
+#if OPENSILVER // WpfCompat extension members need an explicit receiver.
+            _dragPreview.UpdatePosition(this.PointFromScreen(_headerDragOrigin));
+#else
             _dragPreview.UpdatePosition(PointFromScreen(_headerDragOrigin));
+#endif
         }
 
         private void UpdateColumnDrag(Point screenPoint)
@@ -3215,7 +3235,11 @@ namespace TreeGrid.Wpf
                 return;
 
             // Dropping on the group panel groups by the column instead of moving it.
+#if OPENSILVER // WpfCompat extension members need an explicit receiver.
+            _dragPreview?.UpdatePosition(this.PointFromScreen(screenPoint));
+#else
             _dragPreview?.UpdatePosition(PointFromScreen(screenPoint));
+#endif
 
             if (IsOverGroupArea(screenPoint, out var areaPoint))
             {
@@ -4818,7 +4842,12 @@ namespace TreeGrid.Wpf
             args.ContextMenu.PlacementTarget = this;
             args.ContextMenu.Placement = PlacementMode.MousePoint;
 
+#if OPENSILVER
+            // OpenSilver's ContextMenu opens itself on its owner's right-button press, so assigning it
+            // here would reopen the previous menu on the next right-click.
+#else
             ContextMenu = args.ContextMenu;
+#endif
             args.ContextMenu.IsOpen = true;
 
             return true;
@@ -4834,7 +4863,11 @@ namespace TreeGrid.Wpf
             {
                 // TranslatePoint keeps everything in the visual tree; the previous
                 // screen round-trip was an unnecessary source of drift.
+#if OPENSILVER // WpfCompat extension members need an explicit receiver.
+                var headerPoint = this.TranslatePoint(gridPoint, _headerHost);
+#else
                 var headerPoint = TranslatePoint(gridPoint, _headerHost);
+#endif
 
                 if (headerPoint.Y >= 0 && headerPoint.Y <= _headerHost.ActualHeight &&
                     headerPoint.X >= 0 && headerPoint.X <= _headerHost.ActualWidth)
@@ -4847,7 +4880,11 @@ namespace TreeGrid.Wpf
                 }
             }
 
+#if OPENSILVER // WpfCompat extension members need an explicit receiver.
+            var containerPoint = this.TranslatePoint(gridPoint, _container);
+#else
             var containerPoint = TranslatePoint(gridPoint, _container);
+#endif
             var rowIndex = _container.RowIndexFromPoint(containerPoint);
 
             if (rowIndex < 0 || rowIndex >= _dataSource.View.Count)
@@ -4914,6 +4951,16 @@ namespace TreeGrid.Wpf
             if (!AllowPaste || !AllowEditing)
                 return 0;
 
+#if OPENSILVER
+            // Browsers only expose the clipboard asynchronously: read it first, then paste
+            // again. The outcome is reported through PasteCompleted.
+            if (_clipboard.FetchedText == null)
+            {
+                PasteAfterClipboardRead();
+                return 0;
+            }
+#endif
+
             var node = _selection.CurrentNode;
 
             // A group header has no record to paste into; start at the next real row.
@@ -4940,6 +4987,30 @@ namespace TreeGrid.Wpf
 
             return result.UpdatedCells;
         }
+
+#if OPENSILVER
+        private async void PasteAfterClipboardRead()
+        {
+            try
+            {
+                _clipboard.FetchedText = await Clipboard.GetTextAsync() ?? string.Empty;
+            }
+            catch (Exception)
+            {
+                // Clipboard access can be denied by the browser; fail silently as on WPF.
+                return;
+            }
+
+            try
+            {
+                Paste();
+            }
+            finally
+            {
+                _clipboard.FetchedText = null;
+            }
+        }
+#endif
 
         private TreeNode NextRecordNode(int fromIndex)
         {

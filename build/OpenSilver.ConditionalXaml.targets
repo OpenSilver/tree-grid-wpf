@@ -1,0 +1,133 @@
+<Project>
+
+  <!--
+    Conditional markup for XAML files shared between WPF and OpenSilver.
+
+    The markers are ordinary XML comments, each on a line of its own, so WPF compiles the
+    file as written:
+
+      #if OPENSILVER    opens a comment holding OpenSilver markup, closed by "#endif"
+                        or by "#else", after which WPF markup follows up to an "#endif" comment.
+                        Text after the marker, on the same line, is ignored;
+      #if !OPENSILVER   a comment followed by WPF markup up to an "#endif" comment.
+
+    See samples\TreeGrid.Demo\MainWindow.xaml for examples. OpenSilver markup must not
+    contain a double hyphen, since WPF reads it as part of a comment.
+
+    Before the OpenSilver XAML preprocessor runs, every Page containing markers is rewritten
+    under obj\ with the OpenSilver markup uncommented and the WPF markup removed. Removed lines
+    are left blank so line numbers in compiler errors still match the original file.
+  -->
+
+  <UsingTask TaskName="ApplyConditionalXaml"
+             TaskFactory="RoslynCodeTaskFactory"
+             AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <ParameterGroup>
+      <Files ParameterType="Microsoft.Build.Framework.ITaskItem[]" Required="true" />
+      <OutputDirectory ParameterType="System.String" Required="true" />
+      <SourceFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+      <RewrittenFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Using Namespace="System.Collections.Generic" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Text" />
+      <Code Type="Fragment" Language="cs"><![CDATA[
+        var sources = new List<ITaskItem>();
+        var rewritten = new List<ITaskItem>();
+
+        foreach (ITaskItem file in Files)
+        {
+            string path = file.GetMetadata("FullPath");
+            string text = File.ReadAllText(path);
+            if (!text.Contains("<!--#if "))
+                continue;
+
+            string newLine = text.Contains("\r\n") ? "\r\n" : "\n";
+            string[] lines = text.Split(new[] { "\r\n", "\n" }, StringSplitOptions.None);
+
+            // 0: shared markup, 1: OpenSilver markup, 2: WPF markup.
+            int state = 0;
+            int blockStart = 0;
+            bool failed = false;
+
+            for (int i = 0; i < lines.Length && !failed; i++)
+            {
+                string marker = lines[i].Trim();
+                int next = state;
+
+                if ((marker == "<!--#if OPENSILVER" || marker.StartsWith("<!--#if OPENSILVER ")) && state == 0)
+                    next = 1;
+                else if (marker == "<!--#if !OPENSILVER-->" && state == 0)
+                    next = 2;
+                else if (marker == "#else-->" && state == 1)
+                    next = 2;
+                else if ((marker == "#endif-->" && state == 1) || (marker == "<!--#endif-->" && state == 2))
+                    next = 0;
+                else if (marker.StartsWith("<!--#") || marker == "#else-->" || marker == "#endif-->")
+                {
+                    Log.LogError(null, null, null, path, i + 1, 1, 0, 0, "Unexpected conditional XAML marker '{0}'.", marker);
+                    failed = true;
+                    break;
+                }
+                else
+                {
+                    if (state == 2)
+                        lines[i] = string.Empty;
+                    continue;
+                }
+
+                if (state == 0)
+                    blockStart = i + 1;
+                state = next;
+                lines[i] = string.Empty;
+            }
+
+            if (!failed && state != 0)
+            {
+                Log.LogError(null, null, null, path, blockStart, 1, 0, 0, "Conditional XAML block is not closed.");
+                failed = true;
+            }
+
+            if (failed)
+                continue;
+
+            string link = file.GetMetadata("Link");
+            if (string.IsNullOrEmpty(link))
+                link = file.ItemSpec;
+
+            string output = Path.GetFullPath(Path.Combine(OutputDirectory, link));
+            string result = string.Join(newLine, lines);
+            Directory.CreateDirectory(Path.GetDirectoryName(output));
+            if (!File.Exists(output) || File.ReadAllText(output) != result)
+                File.WriteAllText(output, result, new UTF8Encoding(false));
+
+            var item = new TaskItem(output);
+            file.CopyMetadataTo(item);
+            item.SetMetadata("Link", link);
+            sources.Add(file);
+            rewritten.Add(item);
+        }
+
+        SourceFiles = sources.ToArray();
+        RewrittenFiles = rewritten.ToArray();
+      ]]></Code>
+    </Task>
+  </UsingTask>
+
+  <Target Name="ApplyConditionalXaml"
+          BeforeTargets="CSharpXamlForHtml5BeforeCompile;DesignTimeCompilation"
+          Condition="'@(Page)' != ''">
+    <ApplyConditionalXaml Files="@(Page)" OutputDirectory="$(IntermediateOutputPath)ConditionalXaml">
+      <Output ItemName="_ConditionalXamlSource" TaskParameter="SourceFiles" />
+      <Output ItemName="_ConditionalXamlRewritten" TaskParameter="RewrittenFiles" />
+    </ApplyConditionalXaml>
+
+    <ItemGroup>
+      <Page Remove="@(_ConditionalXamlSource)" />
+      <Page Include="@(_ConditionalXamlRewritten)" />
+      <FileWrites Include="@(_ConditionalXamlRewritten)" />
+    </ItemGroup>
+  </Target>
+
+</Project>

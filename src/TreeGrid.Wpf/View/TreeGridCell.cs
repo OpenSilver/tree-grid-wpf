@@ -819,8 +819,13 @@ namespace TreeGrid.Wpf.View
             if (_gripper != null && _gripper.IsMouseOver)
                 return;
 
+#if OPENSILVER // WpfCompat extension members need an explicit receiver.
+            RaiseEvent(new HeaderPointerEventArgs(
+                HeaderPointerDownEvent, Column, this.PointToScreen(e.GetPosition(this))));
+#else
             RaiseEvent(new HeaderPointerEventArgs(
                 HeaderPointerDownEvent, Column, PointToScreen(e.GetPosition(this))));
+#endif
         }
     }
 

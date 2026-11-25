@@ -1,0 +1,50 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TreeGrid.Demo.OpenSilver.Browser", "samples\TreeGrid.Demo.OpenSilver.Browser\TreeGrid.Demo.OpenSilver.Browser.csproj", "{3DAA3FF3-C7A1-4AF7-A589-DC23772756C4}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{827E0CD3-B72D-47B6-A68D-7590B98EB39B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TreeGrid.OpenSilver", "src\TreeGrid.OpenSilver\TreeGrid.OpenSilver.csproj", "{4B0E3E6F-3B12-4DEA-A266-60986EB3889C}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "samples", "samples", "{5D20AA90-6969-D8BD-9DCD-8634F4692FDA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TreeGrid.Demo.OpenSilver", "samples\TreeGrid.Demo.OpenSilver\TreeGrid.Demo.OpenSilver.csproj", "{B8FB73A5-74EC-43F5-AD41-D69BFC56F498}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TreeGrid.Demo.OpenSilver.Simulator", "samples\TreeGrid.Demo.OpenSilver.Simulator\TreeGrid.Demo.OpenSilver.Simulator.csproj", "{62AAB12E-56D4-4637-BA98-3D7D4AB67D78}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4B0E3E6F-3B12-4DEA-A266-60986EB3889C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B0E3E6F-3B12-4DEA-A266-60986EB3889C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B0E3E6F-3B12-4DEA-A266-60986EB3889C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B0E3E6F-3B12-4DEA-A266-60986EB3889C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B8FB73A5-74EC-43F5-AD41-D69BFC56F498}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B8FB73A5-74EC-43F5-AD41-D69BFC56F498}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B8FB73A5-74EC-43F5-AD41-D69BFC56F498}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B8FB73A5-74EC-43F5-AD41-D69BFC56F498}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DAA3FF3-C7A1-4AF7-A589-DC23772756C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DAA3FF3-C7A1-4AF7-A589-DC23772756C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DAA3FF3-C7A1-4AF7-A589-DC23772756C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DAA3FF3-C7A1-4AF7-A589-DC23772756C4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{62AAB12E-56D4-4637-BA98-3D7D4AB67D78}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{62AAB12E-56D4-4637-BA98-3D7D4AB67D78}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{62AAB12E-56D4-4637-BA98-3D7D4AB67D78}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{62AAB12E-56D4-4637-BA98-3D7D4AB67D78}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4B0E3E6F-3B12-4DEA-A266-60986EB3889C} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+		{B8FB73A5-74EC-43F5-AD41-D69BFC56F498} = {5D20AA90-6969-D8BD-9DCD-8634F4692FDA}
+		{3DAA3FF3-C7A1-4AF7-A589-DC23772756C4} = {5D20AA90-6969-D8BD-9DCD-8634F4692FDA}
+		{62AAB12E-56D4-4637-BA98-3D7D4AB67D78} = {5D20AA90-6969-D8BD-9DCD-8634F4692FDA}
+	EndGlobalSection
+EndGlobal

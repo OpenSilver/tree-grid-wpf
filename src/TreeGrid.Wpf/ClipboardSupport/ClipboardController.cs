@@ -100,6 +100,11 @@ namespace TreeGrid.Wpf.ClipboardSupport
 
         public event EventHandler<PasteContentEventArgs> PasteContent;
 
+#if OPENSILVER
+        /// <summary>Clipboard text for the next <see cref="Paste"/>, null until it has been read.</summary>
+        internal string FetchedText { get; set; }
+#endif
+
         // ------------------------------------------------------------------ copy
 
         public bool Copy(IReadOnlyList<TreeNode> nodes, IReadOnlyList<TreeGridColumn> columns, bool isCut = false)
@@ -117,6 +122,9 @@ namespace TreeGrid.Wpf.ClipboardSupport
 
             try
             {
+#if OPENSILVER // The browser clipboard takes plain text only.
+                _ = Clipboard.SetTextAsync(text);
+#else
                 var data = new DataObject();
 
                 data.SetData(DataFormats.UnicodeText, text);
@@ -125,6 +133,7 @@ namespace TreeGrid.Wpf.ClipboardSupport
                 data.SetData(DataFormats.Html, BuildHtmlClipboardFragment(nodes, columns));
 
                 Clipboard.SetDataObject(data, true);
+#endif
                 return true;
             }
             catch (Exception)
@@ -246,6 +255,9 @@ namespace TreeGrid.Wpf.ClipboardSupport
 
             string text;
 
+#if OPENSILVER // The browser clipboard is read ahead, asynchronously; see TreeGridControl.Paste.
+            text = FetchedText;
+#else
             try
             {
                 if (!Clipboard.ContainsText())
@@ -257,6 +269,7 @@ namespace TreeGrid.Wpf.ClipboardSupport
             {
                 return new GridPasteResult();
             }
+#endif
 
             if (string.IsNullOrEmpty(text))
                 return new GridPasteResult();

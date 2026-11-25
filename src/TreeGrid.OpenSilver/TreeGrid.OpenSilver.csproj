@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- OpenSilver build of TreeGrid.Wpf. All sources and XAML are shared with
+       ..\TreeGrid.Wpf and linked here; OpenSilver-specific code is marked with #if OPENSILVER,
+       and XAML with the markers described in build\OpenSilver.ConditionalXaml.targets. -->
+
+  <Import Project="..\..\OpenSilver.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>TreeGrid.Wpf</RootNamespace>
+    <AssemblyName>TreeGrid.OpenSilver</AssemblyName>
+    <EnableDefaultItems>false</EnableDefaultItems>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <PackageId>TreeGrid.OpenSilver</PackageId>
+    <Title>TreeGrid for OpenSilver</Title>
+    <Description>A multi-column tree grid control for OpenSilver (WPF-compatible XAML in the browser). Hierarchical data binding, row and column virtualization, sorting, Excel-style filtering, editing with validation, frozen panes, stacked headers, grouping, footers, drag-and-drop, clipboard support and CSV export. Same source code as TreeGrid.Wpf.</Description>
+    <PackageTags>opensilver;wasm;webassembly;treegrid;tree-grid;treelistview;datagrid;grid;hierarchical;virtualization;control</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenSilver" Version="$(OpenSilverVersion)" />
+    <PackageReference Include="OpenSilver.WpfCompat" Version="$(OpenSilverWpfCompatVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Include="*.cs" />
+    <Compile Include="..\TreeGrid.Wpf\**\*.cs"
+             Exclude="..\TreeGrid.Wpf\bin\**;..\TreeGrid.Wpf\obj\**"
+             Link="%(RecursiveDir)%(Filename)%(Extension)" />
+    <Page Include="..\TreeGrid.Wpf\Themes\*.xaml"
+          Link="Themes\%(Filename)%(Extension)"
+          Generator="MSBuild:Compile" />
+  </ItemGroup>
+
+  <!-- Directory.Build.props packs the icon.png beside each project; this one reuses TreeGrid.Wpf's. -->
+  <ItemGroup>
+    <None Remove="$(MSBuildProjectDirectory)\icon.png" />
+    <None Include="..\TreeGrid.Wpf\icon.png" Pack="true" PackagePath="\" Visible="false" />
+    <None Include="..\..\docs\nuget\TreeGrid.OpenSilver.md" Pack="true" PackagePath="README.md" Visible="false" />
+  </ItemGroup>
+
+  <Import Project="..\..\build\OpenSilver.ConditionalXaml.targets" />
+
+</Project>

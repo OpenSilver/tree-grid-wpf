@@ -17,6 +17,9 @@ namespace TreeGrid.Wpf.View
     internal static class FreezableExtensions
     {
         /// <summary>Freezes when allowed and returns the same instance either way.</summary>
+#if OPENSILVER // OpenSilver brushes, pens and geometries do not derive from Freezable.
+        public static T FreezeIfPossible<T>(this T freezable) where T : class => freezable;
+#else
         public static T FreezeIfPossible<T>(this T freezable) where T : Freezable
         {
             if (freezable != null && !freezable.IsFrozen && freezable.CanFreeze)
@@ -24,5 +27,6 @@ namespace TreeGrid.Wpf.View
 
             return freezable;
         }
+#endif
     }
 }

@@ -435,6 +435,13 @@
                                          BorderBrush="{TemplateBinding ListBorderBrush}"
                                          ItemsSource="{Binding VisibleElements, RelativeSource={RelativeSource TemplatedParent}}"
                                          ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                                    <!--#if OPENSILVER  WPF's ListBox virtualizes by default; OpenSilver's uses a StackPanel.
+                                    <ListBox.ItemsPanel>
+                                        <ItemsPanelTemplate>
+                                            <VirtualizingStackPanel />
+                                        </ItemsPanelTemplate>
+                                    </ListBox.ItemsPanel>
+                                    #endif-->
                                     <ListBox.ItemContainerStyle>
                                         <!-- Retemplated so hover and selection follow the
                                              popup's brushes; the stock ListBoxItem hard-codes

@@ -62,6 +62,7 @@ dotnet add package TreeGrid.Wpf.Export   # optional: Excel and PDF export
 - [Keyboard reference](#keyboard-reference)
 - [Diagnostics](#diagnostics)
 - [Events reference](#events-reference)
+- [OpenSilver](#opensilver)
 - [Known limitations](#known-limitations)
 - [Licence](#licence)
 
@@ -113,6 +114,8 @@ dotnet build TreeGrid.sln
 dotnet run --project samples/TreeGrid.Demo
 ```
 
+The same sources also build for the browser; see [OpenSilver](#opensilver).
+
 ## Projects
 
 | Project | Dependencies | Purpose |
@@ -120,6 +123,8 @@ dotnet run --project samples/TreeGrid.Demo
 | [`TreeGrid.Wpf`](https://www.nuget.org/packages/TreeGrid.Wpf/) | **None** | The control, plus CSV export. |
 | [`TreeGrid.Wpf.Export`](https://www.nuget.org/packages/TreeGrid.Wpf.Export/) | ClosedXML, QuestPDF | Optional. Reference only if you need xlsx or pdf. |
 | `TreeGrid.Demo` | Both | Feature explorer. |
+| `TreeGrid.OpenSilver` | OpenSilver, OpenSilver.WpfCompat | The control for OpenSilver, built from the `TreeGrid.Wpf` sources. |
+| `TreeGrid.Demo.OpenSilver` (+ `.Browser`, `.Simulator`) | `TreeGrid.OpenSilver` | The feature explorer in the browser, sharing the WPF demo's window. |
 
 The split is deliberate: an application that only needs CSV should not pull two
 document libraries into its output.
@@ -1148,6 +1153,83 @@ the row control, and quadratic range selection on shift-click.
 | `RowDragOver` (via `IsAllowed`), `RowDropped` | ✅ |
 | `CopyContent`, `PasteContent` | ✅ |
 | `GridContextMenuOpening` | ✅ |
+
+---
+
+## OpenSilver
+
+The control also runs in the browser on [OpenSilver](https://opensilver.net), which
+executes WPF-style XAML and C# on WebAssembly. Nothing is forked: `TreeGrid.OpenSilver`
+compiles the `TreeGrid.Wpf` sources and theme dictionaries as linked files, and the WPF
+build is unaffected.
+
+```bash
+dotnet build TreeGrid.OpenSilver.sln
+dotnet run --project samples/TreeGrid.Demo.OpenSilver.Browser    # http://localhost:5280
+```
+
+Requires the .NET 10 SDK. Package versions live in `OpenSilver.props`; the preview
+builds come from the OpenSilver MyGet feed listed in `nuget.config`.
+`TreeGrid.Demo.OpenSilver.Simulator` runs the same demo in the OpenSilver Simulator for
+debugging on Windows.
+
+### Using it
+
+The namespaces are unchanged; only the assembly name differs, and there are no pack URIs:
+
+```xml
+xmlns:tg="clr-namespace:TreeGrid.Wpf;assembly=TreeGrid.OpenSilver"
+xmlns:cols="clr-namespace:TreeGrid.Wpf.Columns;assembly=TreeGrid.OpenSilver"
+
+<ResourceDictionary Source="/TreeGrid.OpenSilver;component/Themes/FluentLight.xaml" />
+```
+
+`ResourceDictionary.Source` is only honoured in XAML on OpenSilver. To swap themes at
+runtime, load the dictionary with
+`Application.LoadComponent(dictionary, new Uri("/TreeGrid.OpenSilver;component/Themes/FluentDark.xaml", UriKind.Relative))`.
+The demo pairs the grid themes with
+[OpenSilver.Themes.Modern](https://www.nuget.org/packages/OpenSilver.Themes.Modern)
+for the built-in controls.
+
+### How the sources are shared
+
+- **C#.** Code that has to differ is wrapped in `#if OPENSILVER`, a symbol the OpenSilver
+  SDK defines. Most WPF APIs that OpenSilver lacks — adorners, `OnRender`, `PointToScreen`
+  and others — come from
+  [OpenSilver.WpfCompat](https://github.com/OpenSilver/OpenSilver.WpfCompat), so the
+  blocks are few.
+- **XAML.** Where a shared XAML file has to differ, as in the demo's `MainWindow.xaml`
+  and the filter list in `Generic.xaml`, the alternatives sit in comment markers that
+  WPF ignores and `build/OpenSilver.ConditionalXaml.targets` resolves before OpenSilver
+  compiles the file:
+
+  ```xml
+  <!--#if OPENSILVER  optional note
+  <Slider SmallChange="1" />
+  #else-->
+  <Slider TickFrequency="1" IsSnapToTickEnabled="True" />
+  <!--#endif-->
+  ```
+
+  `<!--#if OPENSILVER` … `#endif-->` adds OpenSilver-only markup, and
+  `<!--#if !OPENSILVER-->` … `<!--#endif-->` keeps markup out of the OpenSilver build.
+  Markers go on lines of their own. The rewritten copies are written under `obj`, so
+  line numbers in XAML errors still match the original file.
+
+### Browser differences
+
+- **Clipboard.** Plain text only; the CSV and HTML flavours are not written. Pasting
+  reads the clipboard asynchronously, so `Paste()` returns 0 and the result arrives
+  through `PasteCompleted`. The browser may ask for permission.
+- **Export.** CSV only, since `TreeGrid.Wpf.Export` depends on WPF-only libraries.
+  `Export` writes synchronously, while the browser's save stream only supports
+  `WriteAsync`, so export to a `MemoryStream` and write that to the file.
+- **Confirmations.** The Yes/No prompts for bulk value change and row delete are shown
+  as OK/Cancel browser dialogs.
+- **Numeric columns** do not filter keystrokes or pasted text while typing; values are
+  still parsed and validated on commit.
+- **Keyboard focus.** <kbd>Tab</kbd> does not move into cell content unless a cell is
+  being edited.
 
 ---
 

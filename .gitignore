@@ -14,3 +14,9 @@
 /.vs/*
 
 artifacts/
+
+/src/TreeGrid.OpenSilver/bin
+/src/TreeGrid.OpenSilver/obj
+/samples/TreeGrid.Demo.OpenSilver*/bin
+/samples/TreeGrid.Demo.OpenSilver*/obj
+/samples/TreeGrid.Demo.OpenSilver.Browser/wwwroot/libs

@@ -1,3 +1,17 @@
+<!--#if OPENSILVER  The OpenSilver build of the control is TreeGrid.OpenSilver.dll.
+<Window x:Class="TreeGrid.Demo.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:tg="clr-namespace:TreeGrid.Wpf;assembly=TreeGrid.OpenSilver"
+        xmlns:cols="clr-namespace:TreeGrid.Wpf.Columns;assembly=TreeGrid.OpenSilver"
+        xmlns:headers="clr-namespace:TreeGrid.Wpf.Headers;assembly=TreeGrid.OpenSilver"
+        xmlns:local="clr-namespace:TreeGrid.Demo"
+        Title="TreeGrid - Feature Explorer"
+        Height="760"
+        Width="1420"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource TreeGrid.Background}">
+#else-->
 <Window x:Class="TreeGrid.Demo.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
@@ -10,6 +24,7 @@
         Width="1420"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource TreeGrid.Background}">
+<!--#endif-->
 
     <Window.Resources>
         <!-- ======================= Custom context menus =======================
@@ -269,21 +284,36 @@
 
                     <TextBlock Style="{StaticResource FieldLabel}"
                                Text="{Binding ElementName=CellFontSlider, Path=Value, StringFormat='Cell font size: {0:F0}'}" />
+<!--#if OPENSILVER  OpenSilver's Slider has no TickFrequency; the code-behind snaps the values instead.
+                    <Slider x:Name="CellFontSlider" Minimum="9" Maximum="20" SmallChange="1"
+                            Value="{Binding ElementName=Tree, Path=CellFontSize, Mode=TwoWay}" />
+#else-->
                     <Slider x:Name="CellFontSlider" Minimum="9" Maximum="20" TickFrequency="1"
                             IsSnapToTickEnabled="True"
                             Value="{Binding ElementName=Tree, Path=CellFontSize, Mode=TwoWay}" />
+<!--#endif-->
 
                     <TextBlock Style="{StaticResource FieldLabel}"
                                Text="{Binding ElementName=RowHeightSlider, Path=Value, StringFormat='Row height: {0:F0}'}" />
+<!--#if OPENSILVER
+                    <Slider x:Name="RowHeightSlider" Minimum="20" Maximum="56" SmallChange="2"
+                            Value="{Binding ElementName=Tree, Path=RowHeight, Mode=TwoWay}" />
+#else-->
                     <Slider x:Name="RowHeightSlider" Minimum="20" Maximum="56" TickFrequency="2"
                             IsSnapToTickEnabled="True"
                             Value="{Binding ElementName=Tree, Path=RowHeight, Mode=TwoWay}" />
+<!--#endif-->
 
                     <TextBlock Style="{StaticResource FieldLabel}"
                                Text="{Binding ElementName=IndentSlider, Path=Value, StringFormat='Indent per level: {0:F0}'}" />
+<!--#if OPENSILVER
+                    <Slider x:Name="IndentSlider" Minimum="8" Maximum="48" SmallChange="2"
+                            Value="{Binding ElementName=Tree, Path=IndentPerLevel, Mode=TwoWay}" />
+#else-->
                     <Slider x:Name="IndentSlider" Minimum="8" Maximum="48" TickFrequency="2"
                             IsSnapToTickEnabled="True"
                             Value="{Binding ElementName=Tree, Path=IndentPerLevel, Mode=TwoWay}" />
+<!--#endif-->
 
                     <CheckBox Content="Conditional formatting" x:Name="ConditionalBox"
                               Checked="OnConditionalChanged" Unchecked="OnConditionalChanged" />

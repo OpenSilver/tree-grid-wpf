@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk.Razor">
+
+  <!-- Runs the OpenSilver demo in the OpenSilver Simulator, a desktop host for debugging. -->
+
+  <Import Project="..\..\OpenSilver.props" />
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenSilver.Simulator" Version="$(OpenSilverVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\TreeGrid.Demo.OpenSilver\TreeGrid.Demo.OpenSilver.csproj" />
+  </ItemGroup>
+
+</Project>

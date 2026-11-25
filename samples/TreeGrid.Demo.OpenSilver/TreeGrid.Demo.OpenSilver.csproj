@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- OpenSilver build of TreeGrid.Demo. MainWindow and DemoData are shared with ..\TreeGrid.Demo;
+       OpenSilver-specific code is marked with #if OPENSILVER, and XAML with the markers described
+       in build\OpenSilver.ConditionalXaml.targets. Run it with the .Browser or .Simulator project. -->
+
+  <Import Project="..\..\OpenSilver.props" />
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Nullable>disable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>TreeGrid.Demo</RootNamespace>
+    <EnableDefaultItems>false</EnableDefaultItems>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="OpenSilver" Version="$(OpenSilverVersion)" />
+    <PackageReference Include="OpenSilver.WpfCompat" Version="$(OpenSilverWpfCompatVersion)" />
+    <PackageReference Include="OpenSilver.Themes.Modern" Version="$(OpenSilverThemesModernVersion)" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\TreeGrid.OpenSilver\TreeGrid.OpenSilver.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Include="App.xaml" Generator="MSBuild:Compile" />
+    <Compile Include="App.xaml.cs" DependentUpon="App.xaml" />
+    <Page Include="..\TreeGrid.Demo\MainWindow.xaml" Link="MainWindow.xaml" Generator="MSBuild:Compile" />
+    <Compile Include="..\TreeGrid.Demo\MainWindow.xaml.cs" Link="MainWindow.xaml.cs" DependentUpon="MainWindow.xaml" />
+    <Compile Include="..\TreeGrid.Demo\DemoData.cs" Link="DemoData.cs" />
+  </ItemGroup>
+
+  <Import Project="..\..\build\OpenSilver.ConditionalXaml.targets" />
+
+</Project>

@@ -68,8 +68,19 @@ namespace TreeGrid.Demo
             Tree.RowDropCompleted += OnRowDropCompleted;
             Tree.ColumnReordered += OnColumnReordered;
 
+#if OPENSILVER // OpenSilver's Slider cannot snap to ticks.
+            SnapToStep(CellFontSlider, 1);
+            SnapToStep(RowHeightSlider, 2);
+            SnapToStep(IndentSlider, 2);
+#endif
+
             LoadHierarchical();
         }
+
+#if OPENSILVER
+        private static void SnapToStep(Slider slider, double step) =>
+            slider.ValueChanged += (s, e) => slider.Value = Math.Round(e.NewValue / step) * step;
+#endif
 
         // ------------------------------------------------------ sidebar sources
 
@@ -283,12 +294,25 @@ namespace TreeGrid.Demo
         {
             var themeName = DarkThemeBox.IsChecked == true ? "FluentDark" : "FluentLight";
 
+#if OPENSILVER // ResourceDictionary.Source only works in XAML; the Modern theme styles the built-in controls.
+            var replacement = new ResourceDictionary();
+            Application.LoadComponent(replacement,
+                new Uri($"/TreeGrid.OpenSilver;component/Themes/{themeName}.xaml", UriKind.Relative));
+
+            if (Application.Current.Theme is OpenSilver.Themes.Modern.ModernTheme modernTheme)
+            {
+                modernTheme.CurrentPalette = DarkThemeBox.IsChecked == true
+                    ? OpenSilver.Themes.Modern.ModernTheme.Palettes.Dark
+                    : OpenSilver.Themes.Modern.ModernTheme.Palettes.Light;
+            }
+#else
             var replacement = new ResourceDictionary
             {
                 Source = new Uri(
                     $"pack://application:,,,/TreeGrid.Wpf;component/Themes/{themeName}.xaml",
                     UriKind.Absolute)
             };
+#endif
 
             var merged = Application.Current.Resources.MergedDictionaries;
 
@@ -644,6 +668,35 @@ namespace TreeGrid.Demo
             Tree.RefreshSelectionFromSource();
         }
 
+#if OPENSILVER // Excel and PDF export need TreeGrid.Wpf.Export, which is WPF-only; the browser dialog is async.
+        private async void OnExport(object sender, RoutedEventArgs e)
+        {
+            var dialog = new Microsoft.Win32.SaveFileDialog
+            {
+                Filter = "CSV file (*.csv)|*.csv",
+                DefaultFileName = "treegrid-export.csv"
+            };
+
+            if (await dialog.ShowDialogAsync() != true)
+                return;
+
+            var options = new GridExportOptions
+            {
+                Title = "TreeGrid export",
+                RowScope = ExportRowScope.VisibleRows,
+                IncludeHeaders = true
+            };
+
+            // The browser file stream only supports WriteAsync, so the export is buffered first.
+            var buffer = new System.IO.MemoryStream();
+            Tree.Export(new CsvExporter(), buffer, options);
+
+            using (var stream = await dialog.OpenFileAsync())
+                await stream.WriteAsync(buffer.GetBuffer(), 0, (int)buffer.Length);
+
+            StatusText.Text = $"Exported to {dialog.SafeFileName}";
+        }
+#else
         private void OnExport(object sender, RoutedEventArgs e)
         {
             var dialog = new SaveFileDialog
@@ -682,6 +735,7 @@ namespace TreeGrid.Demo
 
             StatusText.Text = $"Exported to {Path.GetFileName(dialog.FileName)}";
         }
+#endif
 
         private void OnBenchmark(object sender, RoutedEventArgs e)
         {

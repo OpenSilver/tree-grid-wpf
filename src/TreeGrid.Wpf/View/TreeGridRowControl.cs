@@ -38,6 +38,13 @@ namespace TreeGrid.Wpf.View
         private readonly HashSet<int> _scratchSet = new HashSet<int>();
         private readonly List<int> _staleIndices = new List<int>();
 
+#if OPENSILVER // OpenSilver only calls OnRender through WpfCompat's OnRenderHost.
+        public TreeGridRowControl()
+        {
+            OnRenderHost.AttachTo(this);
+        }
+#endif
+
         public TreeGridRowType RowType { get; set; } = TreeGridRowType.Record;
 
         public ColumnLayout Layout { get; set; }
@@ -496,6 +503,10 @@ namespace TreeGrid.Wpf.View
 
         protected override Size ArrangeOverride(Size finalSize)
         {
+#if OPENSILVER // InvalidateVisual only re-arranges in OpenSilver, so repaint from here.
+            OnRenderHost.Invalidate(this);
+#endif
+
             if (Layout == null)
                 return finalSize;
 
