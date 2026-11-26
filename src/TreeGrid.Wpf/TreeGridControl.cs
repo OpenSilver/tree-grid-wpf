@@ -113,6 +113,9 @@ namespace TreeGrid.Wpf
 
         public TreeGridControl()
         {
+#if OPENSILVER
+            ThemeFallback.EnsureAppBrushes();
+#endif
             Columns = new TreeGridColumns();
             Columns.CollectionChanged += OnColumnsChanged;
 
@@ -1591,6 +1594,9 @@ namespace TreeGrid.Wpf
 
         public override void OnApplyTemplate()
         {
+#if OPENSILVER
+            ThemeFallback.EnsureBrushes(this);
+#endif
             base.OnApplyTemplate();
 
             _groupDropArea = GetTemplateChild(PartGroupDropArea) as GroupDropAreaControl;
