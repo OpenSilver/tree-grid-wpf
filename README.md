@@ -242,6 +242,7 @@ cascade are reapplied to children as they arrive.
 | `IdPropertyName` / `ParentIdPropertyName` | Key columns (self-relational) |
 | `SelfRelationRootValue` | Parent-key value marking a root |
 | `AutoGenerateColumns` | Reflect columns from the first item |
+| `AutoExpandLevels` | Levels expanded when the items load: `0` collapsed (default), `1` the roots, `-1` everything |
 | `DataSource` | `TreeGridDataSource`, for the on-demand hooks |
 | `View` | The live `FlatTreeView` |
 

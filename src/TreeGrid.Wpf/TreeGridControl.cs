@@ -206,6 +206,10 @@ namespace TreeGrid.Wpf
             nameof(IndentPerLevel), typeof(double), typeof(TreeGridControl),
             new PropertyMetadata(18d, OnVisualConfigChanged));
 
+        public static readonly DependencyProperty AutoExpandLevelsProperty = DependencyProperty.Register(
+            nameof(AutoExpandLevels), typeof(int), typeof(TreeGridControl),
+            new PropertyMetadata(0, OnBindingConfigChanged));
+
         public static readonly DependencyProperty ExpanderColumnIndexProperty = DependencyProperty.Register(
             nameof(ExpanderColumnIndex), typeof(int), typeof(TreeGridControl),
             new PropertyMetadata(0, OnVisualConfigChanged));
@@ -659,6 +663,16 @@ namespace TreeGrid.Wpf
         {
             get => (double)GetValue(IndentPerLevelProperty);
             set => SetValue(IndentPerLevelProperty, value);
+        }
+
+        /// <summary>
+        /// Number of levels expanded whenever the items load: 0 (the default) keeps every node collapsed,
+        /// 1 opens the root nodes, and a negative value expands the whole tree.
+        /// </summary>
+        public int AutoExpandLevels
+        {
+            get => (int)GetValue(AutoExpandLevelsProperty);
+            set => SetValue(AutoExpandLevelsProperty, value);
         }
 
         public int ExpanderColumnIndex
@@ -2186,6 +2200,9 @@ namespace TreeGrid.Wpf
             // The cached ungrouped tree belongs to the previous source.
             _ungroupedRoots = null;
             _groupedNodeMap = null;
+
+            if (AutoExpandLevels != 0)
+                _dataSource.View.ExpandAll(AutoExpandLevels < 0 ? int.MaxValue : AutoExpandLevels);
 
             _selection.Restore(ResolveNode);
             _checkState.Restore(ResolveNode);
