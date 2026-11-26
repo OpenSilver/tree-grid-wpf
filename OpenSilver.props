@@ -4,9 +4,9 @@
        Each can be overridden from the command line, e.g. -p:OpenSilverVersion=... -->
 
   <PropertyGroup>
-    <OpenSilverVersion Condition="'$(OpenSilverVersion)' == ''">3.4.0-preview-2026-11-20-102406-941451b4</OpenSilverVersion>
-    <OpenSilverWpfCompatVersion Condition="'$(OpenSilverWpfCompatVersion)' == ''">3.4.0-preview-2026-11-25-195828-77b8c97</OpenSilverWpfCompatVersion>
-    <OpenSilverThemesWpfVersion Condition="'$(OpenSilverThemesWpfVersion)' == ''">3.4.0-preview-2026-08-04-074057-18a38504</OpenSilverThemesWpfVersion>
+    <OpenSilverVersion Condition="'$(OpenSilverVersion)' == ''">3.4.0-preview-2026-11-26-113522-38977eab</OpenSilverVersion>
+    <OpenSilverWpfCompatVersion Condition="'$(OpenSilverWpfCompatVersion)' == ''">3.4.0-preview-2026-11-26-224219-88ef72f</OpenSilverWpfCompatVersion>
+    <OpenSilverThemesWpfVersion Condition="'$(OpenSilverThemesWpfVersion)' == ''">3.4.0-preview-2026-11-26-134030-d24118e6</OpenSilverThemesWpfVersion>
     <AspNetCoreWebAssemblyVersion Condition="'$(AspNetCoreWebAssemblyVersion)' == ''">10.0.0</AspNetCoreWebAssemblyVersion>
   </PropertyGroup>
 
