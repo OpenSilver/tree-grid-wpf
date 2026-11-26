@@ -3679,6 +3679,12 @@ namespace TreeGrid.Wpf
                 AllowsTransparency = true,
                 PopupAnimation = PopupAnimation.Fade
             };
+
+#if OPENSILVER
+            // OpenSilver flips a popup that outgrows the space below the header above it, even when it doesn't fit
+            // there either, and only keeps it inside the window on request; WPF always does.
+            _filterPopup.StaysWithinScreenBounds = true;
+#endif
         }
 
         private void OnFilterPopupResized(object sender, EventArgs e)
