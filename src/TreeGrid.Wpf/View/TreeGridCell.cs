@@ -425,6 +425,13 @@ namespace TreeGrid.Wpf.View
         /// <summary>Opens an editor inside this cell.</summary>
         internal void BeginEdit(FrameworkElement editElement)
         {
+#if OPENSILVER
+            if (editElement != null)
+            {
+                MatchCell(editElement);
+            }
+#endif
+
             EditElement = editElement;
             IsEditing = editElement != null;
 
@@ -438,6 +445,30 @@ namespace TreeGrid.Wpf.View
                 Keyboard.Focus(editElement);
             }), System.Windows.Threading.DispatcherPriority.Input);
         }
+
+#if OPENSILVER
+        // App themes style editors as standalone fields (OpenSilver's Modern theme: 14px text, 32px high), which
+        // would overflow the row; the editor takes the cell's font and height unless the column set its own.
+        private void MatchCell(FrameworkElement editElement)
+        {
+            SetUnlessLocal(editElement, HeightProperty, double.NaN);
+
+            if (editElement is Control control)
+            {
+                SetUnlessLocal(control, FontSizeProperty, FontSize);
+                SetUnlessLocal(control, FontFamilyProperty, FontFamily);
+                SetUnlessLocal(control, FontWeightProperty, FontWeight);
+            }
+        }
+
+        private static void SetUnlessLocal(DependencyObject element, DependencyProperty property, object value)
+        {
+            if (element.ReadLocalValue(property) == DependencyProperty.UnsetValue)
+            {
+                element.SetValue(property, value);
+            }
+        }
+#endif
 
         internal void EndEdit()
         {
