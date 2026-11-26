@@ -26,10 +26,14 @@ xmlns:tg="clr-namespace:TreeGrid.Wpf;assembly=TreeGrid.OpenSilver"
 xmlns:cols="clr-namespace:TreeGrid.Wpf.Columns;assembly=TreeGrid.OpenSilver"
 ```
 
-Merge a theme into your application resources:
+The grid uses its light theme unless the app defines the `TreeGrid.*` brushes. With
+[OpenSilver.Themes.Modern](https://github.com/OpenSilver/OpenSilver.Themes.Modern), it takes
+the colors of the theme's palette instead, and follows its light and dark modes. To keep a
+grid dark whatever the app's mode, merge the dark theme into its resources, or into the
+application resources for every grid:
 
 ```xml
-<ResourceDictionary Source="/TreeGrid.OpenSilver;component/Themes/FluentLight.xaml" />
+<ResourceDictionary Source="/TreeGrid.OpenSilver;component/Themes/FluentDark.xaml" />
 ```
 
 Then declare the grid exactly as on WPF:

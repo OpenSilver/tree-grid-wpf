@@ -1188,6 +1188,13 @@ xmlns:cols="clr-namespace:TreeGrid.Wpf.Columns;assembly=TreeGrid.OpenSilver"
 `ResourceDictionary.Source` is only honoured in XAML on OpenSilver. To swap themes at
 runtime, load the dictionary with
 `Application.LoadComponent(dictionary, new Uri("/TreeGrid.OpenSilver;component/Themes/FluentDark.xaml", UriKind.Relative))`.
+
+Without a theme, the grid gets the light brushes (WPF finds them in `Generic.xaml`;
+OpenSilver doesn't, so `ThemeFallback` merges them). With
+[OpenSilver.Themes.Modern](https://github.com/OpenSilver/OpenSilver.Themes.Modern), they are
+recolored from the theme's palette (`Theme_*Color`) and follow its light and dark modes,
+including palettes changed at runtime. Brushes the app defines, such as `FluentDark`, still
+take precedence.
 The demo pairs the grid themes with
 [OpenSilver.Themes.Wpf](https://github.com/OpenSilver/OpenSilver.Themes.Wpf), which
 gives the built-in controls their WPF look.
