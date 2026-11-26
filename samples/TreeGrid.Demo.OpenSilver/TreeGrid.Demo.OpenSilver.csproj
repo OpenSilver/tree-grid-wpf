@@ -18,7 +18,7 @@
   <ItemGroup>
     <PackageReference Include="OpenSilver" Version="$(OpenSilverVersion)" />
     <PackageReference Include="OpenSilver.WpfCompat" Version="$(OpenSilverWpfCompatVersion)" />
-    <PackageReference Include="OpenSilver.Themes.Modern" Version="$(OpenSilverThemesModernVersion)" />
+    <PackageReference Include="OpenSilver.Themes.Wpf" Version="$(OpenSilverThemesWpfVersion)" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1188,8 +1188,8 @@ xmlns:cols="clr-namespace:TreeGrid.Wpf.Columns;assembly=TreeGrid.OpenSilver"
 runtime, load the dictionary with
 `Application.LoadComponent(dictionary, new Uri("/TreeGrid.OpenSilver;component/Themes/FluentDark.xaml", UriKind.Relative))`.
 The demo pairs the grid themes with
-[OpenSilver.Themes.Modern](https://www.nuget.org/packages/OpenSilver.Themes.Modern)
-for the built-in controls.
+[OpenSilver.Themes.Wpf](https://github.com/OpenSilver/OpenSilver.Themes.Wpf), which
+gives the built-in controls their WPF look.
 
 ### How the sources are shared
 

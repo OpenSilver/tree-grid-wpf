@@ -6,7 +6,7 @@
   <PropertyGroup>
     <OpenSilverVersion Condition="'$(OpenSilverVersion)' == ''">3.4.0-preview-2026-11-20-102406-941451b4</OpenSilverVersion>
     <OpenSilverWpfCompatVersion Condition="'$(OpenSilverWpfCompatVersion)' == ''">3.4.0-preview-2026-11-25-195828-77b8c97</OpenSilverWpfCompatVersion>
-    <OpenSilverThemesModernVersion Condition="'$(OpenSilverThemesModernVersion)' == ''">3.4.0-preview-2026-11-18-093018-cf37a7c9</OpenSilverThemesModernVersion>
+    <OpenSilverThemesWpfVersion Condition="'$(OpenSilverThemesWpfVersion)' == ''">3.4.0-preview-2026-08-04-074057-18a38504</OpenSilverThemesWpfVersion>
     <AspNetCoreWebAssemblyVersion Condition="'$(AspNetCoreWebAssemblyVersion)' == ''">10.0.0</AspNetCoreWebAssemblyVersion>
   </PropertyGroup>
 

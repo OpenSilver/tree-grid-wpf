@@ -1,11 +1,11 @@
 <Application x:Class="TreeGrid.Demo.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mt="http://opensilver.net/themes/modern"
+             xmlns:wt="http://opensilver.net/themes/wpf"
              StartupUri="MainWindow.xaml">
     <Application.Theme>
-        <!-- Styles the built-in controls; the theme toggle switches its palette with the grid's. -->
-        <mt:ModernTheme CurrentPalette="Light" />
+        <!-- Gives the built-in controls their WPF look, as in the WPF demo. -->
+        <wt:WpfTheme />
     </Application.Theme>
     <Application.Resources>
         <ResourceDictionary>

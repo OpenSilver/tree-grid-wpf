@@ -294,17 +294,10 @@ namespace TreeGrid.Demo
         {
             var themeName = DarkThemeBox.IsChecked == true ? "FluentDark" : "FluentLight";
 
-#if OPENSILVER // ResourceDictionary.Source only works in XAML; the Modern theme styles the built-in controls.
+#if OPENSILVER // ResourceDictionary.Source only works in XAML.
             var replacement = new ResourceDictionary();
             Application.LoadComponent(replacement,
                 new Uri($"/TreeGrid.OpenSilver;component/Themes/{themeName}.xaml", UriKind.Relative));
-
-            if (Application.Current.Theme is OpenSilver.Themes.Modern.ModernTheme modernTheme)
-            {
-                modernTheme.CurrentPalette = DarkThemeBox.IsChecked == true
-                    ? OpenSilver.Themes.Modern.ModernTheme.Palettes.Dark
-                    : OpenSilver.Themes.Modern.ModernTheme.Palettes.Light;
-            }
 #else
             var replacement = new ResourceDictionary
             {
