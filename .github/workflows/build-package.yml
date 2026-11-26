@@ -1,0 +1,86 @@
+name: TreeGrid.OpenSilver Build
+
+on:
+  workflow_dispatch:
+    inputs:
+        opensilver-version:
+            description: 'OpenSilver version (empty = the one in OpenSilver.props)'
+            required: false
+            default: ''
+        wpfcompat-version:
+            description: 'OpenSilver.WpfCompat version (empty = the one in OpenSilver.props)'
+            required: false
+            default: ''
+        version:
+            description: 'TreeGrid.OpenSilver package version (empty = preview of NEXT_RELEASE_VERSION)'
+            required: false
+            default: ''
+        publish-myget:
+            description: 'Publish to MyGet.org'
+            required: false
+            type: boolean
+            default: true
+        publish-myget-rc:
+            description: 'Publish to MyGet.org RC feed'
+            required: false
+            type: boolean
+            default: false
+        publish-nuget-org:
+            description: 'Publish to NuGet.org'
+            required: false
+            type: boolean
+            default: false
+
+env:
+  NEXT_RELEASE_VERSION: '3.4.0'
+
+jobs:
+  Build-Pack-Publish:
+    #We should not run these steps on the forks by default.
+    if: github.repository_owner == 'OpenSilver'
+    runs-on: windows-latest
+    steps:
+      - name: Inject slug/short variables
+        uses: rlespinasse/github-slug-action@v4.x
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.x'
+          dotnet-quality: 'ga'
+
+      - name: Clone the repo
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
+
+      - name: Format Package Version
+        id: version
+        shell: pwsh
+        env:
+          VERSION: ${{ inputs.version }}
+        run: |
+          $v = $env:VERSION
+          if ([string]::IsNullOrWhiteSpace($v))
+          {
+            $timestamp = Get-Date -Format "yyyy-MM-dd-HHmmss"
+            $v = "$env:NEXT_RELEASE_VERSION-preview-$timestamp-$env:GITHUB_SHA_SHORT"
+          }
+          "value=$v" >> $env:GITHUB_OUTPUT
+
+      - name: Build TreeGrid.OpenSilver NuGet package
+        run: ./build/Build_NuGet.bat "${{ steps.version.outputs.value }}" "${{ inputs.opensilver-version }}" "${{ inputs.wpfcompat-version }}"
+
+      # MyGet feeds get the package only; the .snupkg symbols go to NuGet.org.
+      - name: Upload packages to MyGet
+        if: ${{ inputs.publish-myget }}
+        run: |
+           dotnet nuget push "build\output\*.nupkg" --no-symbols -k ${{ secrets.MYGET_TOKEN }} -s https://www.myget.org/F/opensilver/api/v2/package
+
+      - name: Upload packages to MyGet RC feed
+        if: ${{ inputs.publish-myget-rc }}
+        run: |
+           dotnet nuget push "build\output\*.nupkg" --no-symbols -k ${{ secrets.MYGET_RC_TOKEN }} -s ${{ secrets.MYGET_RC_FEED }}
+
+      - name: Upload packages to NuGet.org
+        if: ${{ inputs.publish-nuget-org }}
+        run: |
+          dotnet nuget push "build\output\*.nupkg" -k ${{ secrets.NUGET_ORG_API_KEY }} -s https://api.nuget.org/v3/index.json
