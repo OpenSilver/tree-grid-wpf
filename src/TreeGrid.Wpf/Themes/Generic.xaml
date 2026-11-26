@@ -832,12 +832,23 @@
                                     Background="{DynamicResource TreeGrid.HeaderBackground}"
                                     ClipToBounds="True" />
 
+                            <!--#if OPENSILVER  OpenSilver's default ScrollViewer has a border and padding, which shift the rows off the headers.
+                            <ScrollViewer x:Name="PART_ScrollViewer"
+                                          Grid.Row="2"
+                                          BorderThickness="0"
+                                          Padding="0"
+                                          CanContentScroll="True"
+                                          HorizontalScrollBarVisibility="Auto"
+                                          VerticalScrollBarVisibility="Auto"
+                                          Focusable="False">
+                            #else-->
                             <ScrollViewer x:Name="PART_ScrollViewer"
                                           Grid.Row="2"
                                           CanContentScroll="True"
                                           HorizontalScrollBarVisibility="Auto"
                                           VerticalScrollBarVisibility="Auto"
                                           Focusable="False">
+                            <!--#endif-->
                                 <view:VisualContainer x:Name="PART_VisualContainer"
                                                       ClipToBounds="True" />
                             </ScrollViewer>
