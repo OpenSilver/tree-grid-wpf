@@ -55,6 +55,12 @@
                                     Grid.Column="0"
                                     Width="{TemplateBinding Indent}" />
 
+                            <!-- Keeps the expander's width on rows without children, so they line up with their siblings. -->
+                            <Border x:Name="ExpanderSlot"
+                                    Grid.Column="1"
+                                    Width="18"
+                                    Visibility="Collapsed" />
+
                             <!-- Expander -->
                             <Button x:Name="PART_Expander"
                                     Grid.Column="1"
@@ -167,6 +173,9 @@
                         </Trigger>
                         <Trigger Property="IsTreeColumn" Value="False">
                             <Setter TargetName="IndentSpacer" Property="Width" Value="0" />
+                        </Trigger>
+                        <Trigger Property="IsTreeColumn" Value="True">
+                            <Setter TargetName="ExpanderSlot" Property="Visibility" Value="Visible" />
                         </Trigger>
                         <Trigger Property="ShowNodeCheckBox" Value="True">
                             <Setter TargetName="PART_NodeCheckBox" Property="Visibility" Value="Visible" />
