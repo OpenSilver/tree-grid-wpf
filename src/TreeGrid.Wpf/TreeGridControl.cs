@@ -4784,6 +4784,12 @@ namespace TreeGrid.Wpf
             if (_container == null)
                 return;
 
+#if OPENSILVER
+            // OpenSilver suppresses the browser's own menu only when the press comes back handled.
+            if (HasContextMenuAt(e.GetPosition(this)))
+                e.Handled = true;
+#endif
+
             Focus();
 
             // Right-clicking an unselected row selects it first, so menu commands act
@@ -4881,6 +4887,31 @@ namespace TreeGrid.Wpf
 
             return true;
         }
+
+#if OPENSILVER
+        /// <summary>Whether <see cref="ShowContextMenuAt"/> may open a menu at a point in grid coordinates.</summary>
+        private bool HasContextMenuAt(Point gridPoint)
+        {
+            var region = ResolveRegion(gridPoint, out _, out var column);
+
+            if (region == GridRegion.None)
+                return false;
+
+            // A handler can supply its own menu.
+            if (ShowDefaultContextMenus || GridContextMenuOpening != null)
+                return region != GridRegion.Header || column != null;
+
+            switch (region)
+            {
+                case GridRegion.Header:
+                    return column != null && HeaderContextMenu != null;
+                case GridRegion.Expander:
+                    return ExpanderContextMenu != null;
+                default:
+                    return RecordContextMenu != null;
+            }
+        }
+#endif
 
         /// <summary>Resolves which part of the grid a point falls in.</summary>
         private GridRegion ResolveRegion(Point gridPoint, out TreeNode node, out TreeGridColumn column)
